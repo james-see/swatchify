@@ -27,7 +27,7 @@ jobs:
         run: go mod download
 
       - name: Run tests
-        run: go test -v -race -coverprofile=coverage.out ./...
+        run: go test -v -race ./...
 
       - name: Run benchmarks
         run: go test -bench=. -benchmem ./...
@@ -50,4 +50,3 @@ jobs:
         uses: golangci/golangci-lint-action@v4
         with:
           version: latest
-
