@@ -123,6 +123,59 @@ Generates a horizontal color strip with blocks sized proportionally to color pre
 - Memory footprint: < 100MB
 - Images are automatically downscaled for processing speed
 
+## Use as a Library
+
+Swatchify can be imported and used in your Go code:
+
+```go
+package main
+
+import (
+    "fmt"
+    "log"
+
+    "github.com/james-see/swatchify/pkg/swatchify"
+)
+
+func main() {
+    // Extract with default options (5 colors)
+    colors, err := swatchify.ExtractFromFile("photo.jpg", nil)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    for _, c := range colors {
+        fmt.Printf("%s (%.1f%%)\n", c.Hex, c.Percentage)
+    }
+
+    // Custom options
+    opts := &swatchify.Options{
+        NumColors:    8,
+        Quality:      100,
+        ExcludeWhite: true,
+        ExcludeBlack: true,
+        MinContrast:  30,
+    }
+    colors, _ = swatchify.ExtractFromFile("photo.jpg", opts)
+
+    // Generate palette image
+    swatchify.GeneratePalette(colors, "palette.png", nil)
+}
+```
+
+### Library API
+
+```go
+// Extract from file path
+colors, err := swatchify.ExtractFromFile(path string, opts *Options) ([]Color, error)
+
+// Extract from image.Image
+colors, err := swatchify.ExtractFromImage(img image.Image, opts *Options) ([]Color, error)
+
+// Generate palette PNG
+err := swatchify.GeneratePalette(colors []Color, outputPath string, opts *PaletteOptions) error
+```
+
 ## How It Works
 
 1. Load and decode the input image
