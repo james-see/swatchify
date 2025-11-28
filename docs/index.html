@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWATCHIFY — EXTRACT COLORS FROM IMAGES</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #0a0a0a;
+      --white: #f5f5f0;
+      --yellow: #FFFF00;
+      --magenta: #FF00FF;
+      --cyan: #00FFFF;
+      --red: #FF3333;
+      --green: #33FF33;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Space Mono', monospace;
+      background: var(--black);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    .noise {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      z-index: 1000;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      position: relative;
+      border-bottom: 8px solid var(--yellow);
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(255,255,255,0.02) 2px,
+          rgba(255,255,255,0.02) 4px
+        );
+      pointer-events: none;
+    }
+
+    .title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 20vw, 16rem);
+      letter-spacing: -0.02em;
+      line-height: 0.85;
+      text-align: center;
+      position: relative;
+      animation: glitch 3s infinite;
+    }
+
+    .title span {
+      display: block;
+    }
+
+    .title .swatch {
+      color: var(--yellow);
+      text-shadow: 
+        4px 4px 0 var(--magenta),
+        -4px -4px 0 var(--cyan);
+    }
+
+    .title .ify {
+      color: var(--white);
+      margin-left: 0.5em;
+    }
+
+    @keyframes glitch {
+      0%, 90%, 100% { transform: translate(0); }
+      92% { transform: translate(-2px, 2px); }
+      94% { transform: translate(2px, -2px); }
+      96% { transform: translate(-2px, -2px); }
+      98% { transform: translate(2px, 2px); }
+    }
+
+    .tagline {
+      font-size: clamp(1rem, 3vw, 2rem);
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      margin-top: 2rem;
+      padding: 1rem 2rem;
+      border: 4px solid var(--white);
+      background: var(--black);
+      position: relative;
+    }
+
+    .tagline::after {
+      content: '█';
+      animation: blink 1s infinite;
+      margin-left: 0.5em;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    .color-bar {
+      display: flex;
+      width: 100%;
+      height: 20px;
+      margin-top: 3rem;
+    }
+
+    .color-bar div {
+      flex: 1;
+      transition: flex 0.3s ease;
+    }
+
+    .color-bar:hover div:nth-child(odd) {
+      flex: 2;
+    }
+
+    .section {
+      padding: 4rem 2rem;
+      border-bottom: 8px solid var(--magenta);
+    }
+
+    .section:nth-child(even) {
+      background: repeating-linear-gradient(
+        45deg,
+        var(--black),
+        var(--black) 10px,
+        #111 10px,
+        #111 20px
+      );
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 10vw, 8rem);
+      color: var(--cyan);
+      margin-bottom: 2rem;
+      transform: rotate(-2deg);
+      display: inline-block;
+    }
+
+    .install-block {
+      background: var(--white);
+      color: var(--black);
+      padding: 2rem;
+      font-size: clamp(1rem, 2vw, 1.5rem);
+      border: 8px solid var(--black);
+      box-shadow: 12px 12px 0 var(--yellow);
+      margin: 2rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .install-block::before {
+      content: 'INSTALL';
+      position: absolute;
+      top: -10px;
+      right: -30px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem;
+      color: var(--magenta);
+      opacity: 0.2;
+      transform: rotate(15deg);
+    }
+
+    .install-block code {
+      display: block;
+      padding: 1rem;
+      background: var(--black);
+      color: var(--green);
+      margin: 1rem 0;
+      border-left: 4px solid var(--yellow);
+    }
+
+    .install-block h3 {
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-top: 1.5rem;
+      color: var(--magenta);
+    }
+
+    .install-block h3:first-child {
+      margin-top: 0;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .feature {
+      border: 4px solid var(--white);
+      padding: 2rem;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .feature:hover {
+      transform: translate(-4px, -4px);
+      box-shadow: 8px 8px 0 var(--cyan);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      color: var(--yellow);
+      margin-bottom: 0.5rem;
+    }
+
+    .usage-example {
+      background: #111;
+      border: 4px solid var(--green);
+      padding: 2rem;
+      margin: 2rem 0;
+      position: relative;
+    }
+
+    .usage-example::before {
+      content: 'TERMINAL';
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: var(--green);
+      color: var(--black);
+      padding: 0.25rem 1rem;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .usage-example pre {
+      overflow-x: auto;
+      font-size: clamp(0.8rem, 1.5vw, 1.1rem);
+    }
+
+    .prompt {
+      color: var(--cyan);
+    }
+
+    .command {
+      color: var(--white);
+    }
+
+    .output {
+      color: var(--yellow);
+    }
+
+    .cta {
+      display: inline-block;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      padding: 1rem 3rem;
+      background: var(--yellow);
+      color: var(--black);
+      text-decoration: none;
+      border: 4px solid var(--black);
+      transition: all 0.1s ease;
+      margin: 1rem 0.5rem;
+    }
+
+    .cta:hover {
+      transform: translate(-4px, -4px);
+      box-shadow: 8px 8px 0 var(--magenta);
+    }
+
+    .cta.secondary {
+      background: transparent;
+      color: var(--white);
+      border-color: var(--white);
+    }
+
+    .cta.secondary:hover {
+      box-shadow: 8px 8px 0 var(--cyan);
+    }
+
+    .formats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .format-badge {
+      padding: 0.5rem 1.5rem;
+      border: 3px solid var(--white);
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      transition: all 0.2s ease;
+    }
+
+    .format-badge:hover {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    footer {
+      padding: 4rem 2rem;
+      text-align: center;
+      border-top: 8px solid var(--yellow);
+      background: 
+        linear-gradient(90deg, var(--magenta) 0%, var(--magenta) 33%, var(--cyan) 33%, var(--cyan) 66%, var(--yellow) 66%, var(--yellow) 100%);
+      background-size: 100% 4px;
+      background-repeat: no-repeat;
+      background-position: top;
+    }
+
+    footer p {
+      font-size: 1.2rem;
+      margin: 1rem 0;
+    }
+
+    .marquee {
+      overflow: hidden;
+      white-space: nowrap;
+      padding: 1rem 0;
+      background: var(--yellow);
+      color: var(--black);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+    }
+
+    .marquee-content {
+      display: inline-block;
+      animation: marquee 20s linear infinite;
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .palette-demo {
+      display: flex;
+      height: 120px;
+      margin: 2rem 0;
+      border: 4px solid var(--white);
+    }
+
+    .palette-demo div {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: clamp(0.7rem, 1.5vw, 1rem);
+      transition: flex 0.3s ease;
+    }
+
+    .palette-demo:hover div:hover {
+      flex: 3;
+    }
+
+    @media (max-width: 768px) {
+      .title {
+        font-size: 4rem;
+      }
+      
+      .section {
+        padding: 2rem 1rem;
+      }
+      
+      .install-block {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="noise"></div>
+  
+  <section class="hero">
+    <h1 class="title">
+      <span class="swatch">SWATCH</span>
+      <span class="ify">IFY</span>
+    </h1>
+    <p class="tagline">Extract Dominant Colors From Images</p>
+    <div class="color-bar">
+      <div style="background: #FF0000;"></div>
+      <div style="background: #FF8800;"></div>
+      <div style="background: #FFFF00;"></div>
+      <div style="background: #00FF00;"></div>
+      <div style="background: #00FFFF;"></div>
+      <div style="background: #0088FF;"></div>
+      <div style="background: #FF00FF;"></div>
+    </div>
+  </section>
+
+  <div class="marquee">
+    <span class="marquee-content">
+      ◆ FAST ◆ CROSS-PLATFORM ◆ K-MEANS CLUSTERING ◆ JSON OUTPUT ◆ PALETTE GENERATION ◆ HEX VALUES ◆ CLI TOOL ◆ OPEN SOURCE ◆ 
+      ◆ FAST ◆ CROSS-PLATFORM ◆ K-MEANS CLUSTERING ◆ JSON OUTPUT ◆ PALETTE GENERATION ◆ HEX VALUES ◆ CLI TOOL ◆ OPEN SOURCE ◆ 
+    </span>
+  </div>
+
+  <section class="section">
+    <h2 class="section-title">GET IT NOW</h2>
+    
+    <div class="install-block">
+      <h3>Go Install</h3>
+      <code>go install github.com/james-see/swatchify@latest</code>
+      
+      <h3>Homebrew</h3>
+      <code>brew install james-see/tap/swatchify</code>
+      
+      <h3>Download Binary</h3>
+      <code>→ github.com/james-see/swatchify/releases</code>
+    </div>
+
+    <a href="https://github.com/james-see/swatchify" class="cta">★ GITHUB</a>
+    <a href="https://github.com/james-see/swatchify/releases" class="cta secondary">DOWNLOAD</a>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">HOW IT WORKS</h2>
+    
+    <div class="usage-example">
+      <pre>
+<span class="prompt">$</span> <span class="command">swatchify photo.jpg</span>
+<span class="output">#131014
+#7673AD
+#73500A
+#B68296
+#44353B</span>
+
+<span class="prompt">$</span> <span class="command">swatchify logo.png -n 8 --json</span>
+<span class="output">{
+  "image": "logo.png",
+  "colors": [
+    {"hex": "#FF0000", "percentage": 34.5},
+    {"hex": "#00FF00", "percentage": 21.0},
+    ...
+  ]
+}</span>
+
+<span class="prompt">$</span> <span class="command">swatchify brand.png --png palette.png --show</span>
+<span class="output">→ Opens palette image with hex labels</span>
+      </pre>
+    </div>
+
+    <h3 style="color: var(--yellow); margin: 2rem 0 1rem; font-size: 1.5rem;">EXAMPLE PALETTE OUTPUT:</h3>
+    <div class="palette-demo">
+      <div style="background: #131014; color: #fff;">#131014</div>
+      <div style="background: #7673AD; color: #fff;">#7673AD</div>
+      <div style="background: #73500A; color: #fff;">#73500A</div>
+      <div style="background: #B68296; color: #fff;">#B68296</div>
+      <div style="background: #44353B; color: #fff;">#44353B</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">FEATURES</h2>
+    
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">⚡</div>
+        <h3>BLAZING FAST</h3>
+        <p>Sub-300ms processing. Automatic image downscaling for speed without sacrificing accuracy.</p>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon">🎯</div>
+        <h3>K-MEANS++</h3>
+        <p>Advanced clustering algorithm for accurate dominant color extraction.</p>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon">📊</div>
+        <h3>JSON OUTPUT</h3>
+        <p>Machine-readable output with hex values and percentage weights.</p>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon">🎨</div>
+        <h3>PALETTE PNG</h3>
+        <p>Generate visual palettes with proportional color blocks and hex labels.</p>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon">🔧</div>
+        <h3>FILTERS</h3>
+        <p>Exclude white, black, or similar colors. Control minimum contrast.</p>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon">💻</div>
+        <h3>CROSS-PLATFORM</h3>
+        <p>Single binary for macOS, Linux, and Windows. ARM64 supported.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">SUPPORTED FORMATS</h2>
+    
+    <div class="formats">
+      <span class="format-badge">JPEG</span>
+      <span class="format-badge">PNG</span>
+      <span class="format-badge">WebP</span>
+      <span class="format-badge">GIF</span>
+      <span class="format-badge">BMP</span>
+      <span class="format-badge">TIFF</span>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">ALL FLAGS</h2>
+    
+    <div class="usage-example">
+      <pre>
+<span class="command">-n, --colors</span>     <span class="output">Number of colors (default: 5)</span>
+<span class="command">--json</span>           <span class="output">Output as JSON</span>
+<span class="command">--png</span>            <span class="output">Generate palette PNG</span>
+<span class="command">--exclude-white</span>  <span class="output">Skip near-white colors</span>
+<span class="command">--exclude-black</span>  <span class="output">Skip near-black colors</span>
+<span class="command">--min-contrast</span>   <span class="output">Min distance between colors</span>
+<span class="command">--show</span>           <span class="output">Open palette after creation</span>
+<span class="command">--quality</span>        <span class="output">0-100, accuracy vs speed</span>
+<span class="command">--width</span>          <span class="output">Palette width (default: 1000)</span>
+<span class="command">--height</span>         <span class="output">Palette height (default: 200)</span>
+      </pre>
+    </div>
+  </section>
+
+  <footer>
+    <p style="font-family: 'Bebas Neue', sans-serif; font-size: 3rem; color: var(--yellow);">MADE FOR MAKERS</p>
+    <p>Built with Go. MIT License.</p>
+    <p style="margin-top: 2rem;">
+      <a href="https://github.com/james-see/swatchify" class="cta">VIEW ON GITHUB</a>
+    </p>
+    <p style="margin-top: 2rem; opacity: 0.6; font-size: 0.9rem;">
+      © 2025 James Campbell
+    </p>
+  </footer>
+</body>
+</html>
+
