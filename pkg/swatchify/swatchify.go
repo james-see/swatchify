@@ -162,4 +162,3 @@ func GeneratePalette(colors []Color, outputPath string, opts *PaletteOptions) er
 		Height: opts.Height,
 	})
 }
-

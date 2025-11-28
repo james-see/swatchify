@@ -426,8 +426,8 @@
 
   <div class="marquee">
     <span class="marquee-content">
-      ◆ FAST ◆ CROSS-PLATFORM ◆ K-MEANS CLUSTERING ◆ JSON OUTPUT ◆ PALETTE GENERATION ◆ HEX VALUES ◆ CLI TOOL ◆ OPEN SOURCE ◆ 
-      ◆ FAST ◆ CROSS-PLATFORM ◆ K-MEANS CLUSTERING ◆ JSON OUTPUT ◆ PALETTE GENERATION ◆ HEX VALUES ◆ CLI TOOL ◆ OPEN SOURCE ◆ 
+      ◆ REST API ◆ GO LIBRARY ◆ CLI TOOL ◆ K-MEANS CLUSTERING ◆ JSON OUTPUT ◆ PALETTE PNG ◆ CROSS-PLATFORM ◆ OPEN SOURCE ◆ 
+      ◆ REST API ◆ GO LIBRARY ◆ CLI TOOL ◆ K-MEANS CLUSTERING ◆ JSON OUTPUT ◆ PALETTE PNG ◆ CROSS-PLATFORM ◆ OPEN SOURCE ◆ 
     </span>
   </div>
 
@@ -491,9 +491,21 @@
     
     <div class="features">
       <div class="feature">
+        <div class="feature-icon">🌐</div>
+        <h3>REST API SERVER</h3>
+        <p>Run as HTTP server. POST images, get JSON colors back. CORS enabled.</p>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon">📦</div>
+        <h3>GO LIBRARY</h3>
+        <p>Import as a package. ExtractFromFile(), ExtractFromImage(), GeneratePalette().</p>
+      </div>
+      
+      <div class="feature">
         <div class="feature-icon">⚡</div>
         <h3>BLAZING FAST</h3>
-        <p>Sub-300ms processing. Automatic image downscaling for speed without sacrificing accuracy.</p>
+        <p>Sub-300ms processing. Automatic image downscaling for speed.</p>
       </div>
       
       <div class="feature">
@@ -542,7 +554,53 @@
   </section>
 
   <section class="section">
-    <h2 class="section-title">ALL FLAGS</h2>
+    <h2 class="section-title">API SERVER</h2>
+    
+    <div class="usage-example">
+      <pre>
+<span class="prompt">$</span> <span class="command">swatchify serve --port 8080</span>
+<span class="output">🎨 Swatchify server starting on http://localhost:8080</span>
+
+<span class="prompt">$</span> <span class="command">curl -X POST -F "image=@photo.jpg" localhost:8080/extract</span>
+<span class="output">{
+  "success": true,
+  "colors": [
+    {"hex": "#FF0000", "percentage": 34.5},
+    {"hex": "#00FF00", "percentage": 21.0}
+  ]
+}</span>
+
+<span class="prompt">$</span> <span class="command">curl -X POST -F "image=@photo.jpg" -F "colors=8" \
+     -F "exclude_white=true" localhost:8080/extract</span>
+      </pre>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">GO LIBRARY</h2>
+    
+    <div class="usage-example">
+      <pre>
+<span class="command">import</span> <span class="output">"github.com/james-see/swatchify/pkg/swatchify"</span>
+
+<span class="command">// Extract colors from file</span>
+colors, err := swatchify.ExtractFromFile(<span class="output">"photo.jpg"</span>, nil)
+
+<span class="command">// With options</span>
+opts := &swatchify.Options{
+    NumColors:    8,
+    ExcludeWhite: true,
+}
+colors, _ := swatchify.ExtractFromFile(<span class="output">"photo.jpg"</span>, opts)
+
+<span class="command">// Generate palette</span>
+swatchify.GeneratePalette(colors, <span class="output">"palette.png"</span>, nil)
+      </pre>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">CLI FLAGS</h2>
     
     <div class="usage-example">
       <pre>
@@ -556,6 +614,8 @@
 <span class="command">--quality</span>        <span class="output">0-100, accuracy vs speed</span>
 <span class="command">--width</span>          <span class="output">Palette width (default: 1000)</span>
 <span class="command">--height</span>         <span class="output">Palette height (default: 200)</span>
+
+<span class="command">serve --port</span>     <span class="output">Start API server on port</span>
       </pre>
     </div>
   </section>

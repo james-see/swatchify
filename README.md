@@ -123,6 +123,60 @@ Generates a horizontal color strip with blocks sized proportionally to color pre
 - Memory footprint: < 100MB
 - Images are automatically downscaled for processing speed
 
+## Run as API Server
+
+Start swatchify as an HTTP server for REST API access:
+
+```bash
+swatchify serve --port 8080
+```
+
+### Endpoints
+
+**POST /extract** — Extract colors from uploaded image
+
+```bash
+# Basic usage
+curl -X POST -F "image=@photo.jpg" http://localhost:8080/extract
+
+# With options
+curl -X POST \
+  -F "image=@photo.jpg" \
+  -F "colors=8" \
+  -F "quality=100" \
+  -F "exclude_white=true" \
+  http://localhost:8080/extract
+```
+
+Response:
+```json
+{
+  "success": true,
+  "colors": [
+    {"hex": "#112233", "percentage": 34.5},
+    {"hex": "#AABBCC", "percentage": 21.0}
+  ]
+}
+```
+
+**GET /health** — Health check
+
+```bash
+curl http://localhost:8080/health
+# {"status": "ok"}
+```
+
+### Form Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `image` | file | required | Image file to analyze |
+| `colors` | int | 5 | Number of colors to extract |
+| `quality` | int | 50 | Quality 0-100 |
+| `exclude_white` | bool | false | Exclude near-white colors |
+| `exclude_black` | bool | false | Exclude near-black colors |
+| `min_contrast` | float | 0 | Minimum color distance |
+
 ## Use as a Library
 
 Swatchify can be imported and used in your Go code:
