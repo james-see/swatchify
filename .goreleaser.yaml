@@ -42,5 +42,12 @@ changelog:
       - '^test:'
       - '^chore:'
 
-# Homebrew formula is managed manually in james-see/homebrew-tap
+brews:
+  - repository:
+      owner: james-see
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    homepage: https://github.com/james-see/swatchify
+    description: Extract dominant colors from images
+    license: MIT
 
