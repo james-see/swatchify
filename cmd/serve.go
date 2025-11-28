@@ -97,9 +97,9 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
 		"name":    "swatchify",
-		"version": "0.2.0",
+		"version": "0.3.0",
 		"endpoints": map[string]string{
 			"POST /extract": "Extract dominant colors from image",
 			"GET /health":   "Health check",
@@ -109,7 +109,7 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 
 func handleHealth(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
+	_ = json.NewEncoder(w).Encode(map[string]string{
 		"status": "ok",
 	})
 }
@@ -126,7 +126,7 @@ func handleExtract(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(ExtractResponse{
+		_ = json.NewEncoder(w).Encode(ExtractResponse{
 			Success: false,
 			Error:   "Method not allowed. Use POST.",
 		})
@@ -136,7 +136,7 @@ func handleExtract(w http.ResponseWriter, r *http.Request) {
 	// Parse multipart form (max 32MB)
 	if err := r.ParseMultipartForm(32 << 20); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ExtractResponse{
+		_ = json.NewEncoder(w).Encode(ExtractResponse{
 			Success: false,
 			Error:   "Failed to parse form: " + err.Error(),
 		})
@@ -147,7 +147,7 @@ func handleExtract(w http.ResponseWriter, r *http.Request) {
 	file, header, err := r.FormFile("image")
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ExtractResponse{
+		_ = json.NewEncoder(w).Encode(ExtractResponse{
 			Success: false,
 			Error:   "No image file provided. Use form field 'image'.",
 		})
@@ -159,7 +159,7 @@ func handleExtract(w http.ResponseWriter, r *http.Request) {
 	tmpFile, err := os.CreateTemp("", "swatchify-*"+getExtension(header.Filename))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(ExtractResponse{
+		_ = json.NewEncoder(w).Encode(ExtractResponse{
 			Success: false,
 			Error:   "Failed to create temp file",
 		})
@@ -171,7 +171,7 @@ func handleExtract(w http.ResponseWriter, r *http.Request) {
 	// Copy uploaded file to temp
 	if _, err := io.Copy(tmpFile, file); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(ExtractResponse{
+		_ = json.NewEncoder(w).Encode(ExtractResponse{
 			Success: false,
 			Error:   "Failed to save uploaded file",
 		})
@@ -185,14 +185,14 @@ func handleExtract(w http.ResponseWriter, r *http.Request) {
 	colors, err := swatchify.ExtractFromFile(tmpFile.Name(), opts)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ExtractResponse{
+		_ = json.NewEncoder(w).Encode(ExtractResponse{
 			Success: false,
 			Error:   "Failed to extract colors: " + err.Error(),
 		})
 		return
 	}
 
-	json.NewEncoder(w).Encode(ExtractResponse{
+	_ = json.NewEncoder(w).Encode(ExtractResponse{
 		Success: true,
 		Colors:  colors,
 	})
