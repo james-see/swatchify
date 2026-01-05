@@ -3,7 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SWATCHIFY — EXTRACT COLORS FROM IMAGES</title>
+  <title>Swatchify — Extract Dominant Colors from Images | Go CLI, REST API & JavaScript Library</title>
+  <meta name="description" content="Extract dominant colors from images using k-means clustering. Available as a Go CLI tool, REST API server, Go library, and browser-only JavaScript npm package (swatchme). Open source, blazing fast, zero dependencies.">
+  <meta name="keywords" content="color extraction, dominant colors, image palette, k-means clustering, color picker, go library, javascript library, npm package, swatchme, cli tool, rest api, image processing, color analysis">
+  <meta name="author" content="James Campbell">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Swatchify — Extract Dominant Colors from Images">
+  <meta property="og:description" content="Extract dominant colors from images using k-means clustering. CLI, REST API, Go library, and browser-only JavaScript npm package.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://james-see.github.io/swatchify/">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Swatchify — Extract Dominant Colors from Images">
+  <meta name="twitter:description" content="Extract dominant colors from images using k-means clustering. CLI, REST API, Go library, and browser-only JavaScript npm package.">
+  
+  <link rel="canonical" href="https://james-see.github.io/swatchify/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
@@ -283,6 +300,11 @@
       color: var(--yellow);
     }
 
+    .comment {
+      color: #666;
+      font-style: italic;
+    }
+
     .cta {
       display: inline-block;
       font-family: 'Bebas Neue', sans-serif;
@@ -426,8 +448,8 @@
 
   <div class="marquee">
     <span class="marquee-content">
-      ◆ REST API ◆ GO LIBRARY ◆ CLI TOOL ◆ K-MEANS CLUSTERING ◆ JSON OUTPUT ◆ PALETTE PNG ◆ CROSS-PLATFORM ◆ OPEN SOURCE ◆ 
-      ◆ REST API ◆ GO LIBRARY ◆ CLI TOOL ◆ K-MEANS CLUSTERING ◆ JSON OUTPUT ◆ PALETTE PNG ◆ CROSS-PLATFORM ◆ OPEN SOURCE ◆ 
+      ◆ NPM PACKAGE ◆ BROWSER-ONLY ◆ REST API ◆ GO LIBRARY ◆ CLI TOOL ◆ K-MEANS CLUSTERING ◆ JSON OUTPUT ◆ PALETTE PNG ◆ CROSS-PLATFORM ◆ OPEN SOURCE ◆ 
+      ◆ NPM PACKAGE ◆ BROWSER-ONLY ◆ REST API ◆ GO LIBRARY ◆ CLI TOOL ◆ K-MEANS CLUSTERING ◆ JSON OUTPUT ◆ PALETTE PNG ◆ CROSS-PLATFORM ◆ OPEN SOURCE ◆ 
     </span>
   </div>
 
@@ -447,6 +469,70 @@
 
     <a href="https://github.com/james-see/swatchify" class="cta">★ GITHUB</a>
     <a href="https://github.com/james-see/swatchify/releases" class="cta secondary">DOWNLOAD</a>
+  </section>
+
+  <section class="section" id="javascript">
+    <h2 class="section-title">BROWSER-ONLY JS</h2>
+    
+    <article itemscope itemtype="https://schema.org/SoftwareApplication">
+      <meta itemprop="name" content="swatchme">
+      <meta itemprop="applicationCategory" content="DeveloperApplication">
+      <meta itemprop="operatingSystem" content="Browser">
+      
+      <div class="install-block" style="box-shadow: 12px 12px 0 var(--cyan);">
+        <h3>NPM Install — Client-Side Color Extraction</h3>
+        <code>npm install swatchme</code>
+        
+        <p style="margin-top: 1.5rem; line-height: 1.6;">
+          <strong>swatchme</strong> is a zero-dependency JavaScript/TypeScript library for extracting dominant colors from images entirely in the browser. No server required. Uses the same k-means++ clustering algorithm as the Go version. ~2KB gzipped.
+        </p>
+      </div>
+      
+      <div class="usage-example" style="border-color: var(--cyan);">
+        <pre>
+<span class="command">import</span> { extractColors, generatePaletteCanvas } <span class="command">from</span> <span class="output">'swatchme'</span>;
+
+<span class="comment">// Extract colors from a file input</span>
+<span class="command">const</span> file = document.querySelector(<span class="output">'input[type="file"]'</span>).files[0];
+<span class="command">const</span> colors = <span class="command">await</span> extractColors(file, {
+  numColors: 6,
+  excludeWhite: <span class="output">true</span>
+});
+
+<span class="output">// → [{ hex: "#4A90D9", percentage: 32.5, rgb: {r,g,b} }, ...]</span>
+
+<span class="comment">// Generate a palette canvas</span>
+<span class="command">const</span> canvas = generatePaletteCanvas(colors, 500, 100);
+document.body.appendChild(canvas);
+        </pre>
+      </div>
+      
+      <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: 2rem;">
+        <div class="feature" style="border-color: var(--cyan);">
+          <div class="feature-icon">🌐</div>
+          <h3 style="color: var(--cyan);">BROWSER ONLY</h3>
+          <p>100% client-side. No server calls. Works offline.</p>
+        </div>
+        <div class="feature" style="border-color: var(--cyan);">
+          <div class="feature-icon">📦</div>
+          <h3 style="color: var(--cyan);">ZERO DEPS</h3>
+          <p>No runtime dependencies. ~2KB gzipped.</p>
+        </div>
+        <div class="feature" style="border-color: var(--cyan);">
+          <div class="feature-icon">🔌</div>
+          <h3 style="color: var(--cyan);">ANY INPUT</h3>
+          <p>File, Blob, Image, Canvas, ImageData, or URL.</p>
+        </div>
+        <div class="feature" style="border-color: var(--cyan);">
+          <div class="feature-icon">📝</div>
+          <h3 style="color: var(--cyan);">TYPESCRIPT</h3>
+          <p>Full TypeScript support with exported types.</p>
+        </div>
+      </div>
+      
+      <a href="https://www.npmjs.com/package/swatchme" class="cta" style="background: var(--cyan); margin-top: 2rem;">NPM PACKAGE</a>
+      <a href="https://github.com/james-see/swatchify/tree/main/js" class="cta secondary">JS SOURCE</a>
+    </article>
   </section>
 
   <section class="section">
@@ -500,6 +586,12 @@
         <div class="feature-icon">📦</div>
         <h3>GO LIBRARY</h3>
         <p>Import as a package. ExtractFromFile(), ExtractFromImage(), GeneratePalette().</p>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon">🟨</div>
+        <h3>NPM PACKAGE</h3>
+        <p>Browser-only JavaScript library. Zero deps, ~2KB gzipped. npm install swatchme</p>
       </div>
       
       <div class="feature">
@@ -627,7 +719,7 @@ swatchify.GeneratePalette(colors, <span class="output">"palette.png"</span>, nil
       <a href="https://github.com/james-see/swatchify" class="cta">VIEW ON GITHUB</a>
     </p>
     <p style="margin-top: 2rem; opacity: 0.6; font-size: 0.9rem;">
-      © 2025 James Campbell
+      © 2025-2026 James Campbell
     </p>
   </footer>
 </body>
