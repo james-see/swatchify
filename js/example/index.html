@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swatchify Demo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: #0f0f0f;
+      color: #fff;
+      min-height: 100vh;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .subtitle {
+      color: #888;
+      margin-bottom: 2rem;
+    }
+    
+    .drop-zone {
+      border: 2px dashed #444;
+      border-radius: 12px;
+      padding: 3rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #1a1a1a;
+      margin-bottom: 2rem;
+    }
+    
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: #667eea;
+      background: #1f1f2e;
+    }
+    
+    .drop-zone p {
+      margin: 0;
+      color: #888;
+    }
+    
+    .drop-zone input {
+      display: none;
+    }
+    
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: #1a1a1a;
+      border-radius: 12px;
+    }
+    
+    .option {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .option label {
+      font-size: 0.85rem;
+      color: #888;
+    }
+    
+    .option input[type="number"] {
+      background: #2a2a2a;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 0.5rem;
+      color: #fff;
+      width: 100%;
+    }
+    
+    .option input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .checkbox-row {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .result {
+      display: none;
+      margin-top: 2rem;
+    }
+    
+    .result.visible {
+      display: block;
+    }
+    
+    .preview-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    @media (max-width: 600px) {
+      .preview-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .preview-box {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 1rem;
+    }
+    
+    .preview-box h3 {
+      margin: 0 0 1rem 0;
+      font-size: 0.9rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    #preview-image {
+      width: 100%;
+      border-radius: 8px;
+      display: block;
+    }
+    
+    #palette-canvas {
+      width: 100%;
+      border-radius: 8px;
+      display: block;
+    }
+    
+    .colors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 1rem;
+    }
+    
+    .color-card {
+      background: #1a1a1a;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.2s ease;
+    }
+    
+    .color-card:hover {
+      transform: translateY(-2px);
+    }
+    
+    .color-swatch {
+      height: 80px;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .color-swatch::after {
+      content: 'Click to copy';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.5);
+      opacity: 0;
+      transition: opacity 0.2s;
+      font-size: 0.75rem;
+    }
+    
+    .color-swatch:hover::after {
+      opacity: 1;
+    }
+    
+    .color-info {
+      padding: 0.75rem;
+    }
+    
+    .color-hex {
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .color-percent {
+      font-size: 0.8rem;
+      color: #666;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #333;
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .toast.visible {
+      transform: translateX(-50%) translateY(0);
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #888;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #333;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <h1>Swatchify</h1>
+  <p class="subtitle">Extract dominant colors from any image — client-side, no server required</p>
+  
+  <div class="drop-zone" id="dropZone">
+    <p>📷 Drop an image here or click to select</p>
+    <input type="file" id="fileInput" accept="image/*">
+  </div>
+  
+  <div class="options">
+    <div class="option">
+      <label for="numColors">Number of colors</label>
+      <input type="number" id="numColors" value="6" min="1" max="20">
+    </div>
+    <div class="option">
+      <label for="quality">Quality (0-100)</label>
+      <input type="number" id="quality" value="50" min="0" max="100">
+    </div>
+    <div class="option checkbox-row">
+      <input type="checkbox" id="excludeWhite">
+      <label for="excludeWhite">Exclude white</label>
+    </div>
+    <div class="option checkbox-row">
+      <input type="checkbox" id="excludeBlack">
+      <label for="excludeBlack">Exclude black</label>
+    </div>
+  </div>
+  
+  <div class="result" id="result">
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Extracting colors...</p>
+    </div>
+    
+    <div id="resultContent" style="display: none;">
+      <div class="preview-container">
+        <div class="preview-box">
+          <h3>Original Image</h3>
+          <img id="preview-image" alt="Preview">
+        </div>
+        <div class="preview-box">
+          <h3>Color Palette</h3>
+          <canvas id="palette-canvas"></canvas>
+        </div>
+      </div>
+      
+      <div class="colors-grid" id="colorsGrid"></div>
+    </div>
+  </div>
+  
+  <div class="toast" id="toast">Copied!</div>
+
+  <script type="module">
+    import { extractColors, generatePaletteCanvas, getContrastColor } from '../src/index.ts';
+    
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const result = document.getElementById('result');
+    const loading = document.getElementById('loading');
+    const resultContent = document.getElementById('resultContent');
+    const previewImage = document.getElementById('preview-image');
+    const paletteCanvas = document.getElementById('palette-canvas');
+    const colorsGrid = document.getElementById('colorsGrid');
+    const toast = document.getElementById('toast');
+    
+    // Options
+    const numColorsInput = document.getElementById('numColors');
+    const qualityInput = document.getElementById('quality');
+    const excludeWhiteInput = document.getElementById('excludeWhite');
+    const excludeBlackInput = document.getElementById('excludeBlack');
+    
+    // Drop zone handlers
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        processImage(file);
+      }
+    });
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) processImage(file);
+    });
+    
+    async function processImage(file) {
+      result.classList.add('visible');
+      loading.style.display = 'block';
+      resultContent.style.display = 'none';
+      
+      // Show preview
+      const url = URL.createObjectURL(file);
+      previewImage.src = url;
+      
+      try {
+        const options = {
+          numColors: parseInt(numColorsInput.value) || 6,
+          quality: parseInt(qualityInput.value) || 50,
+          excludeWhite: excludeWhiteInput.checked,
+          excludeBlack: excludeBlackInput.checked,
+        };
+        
+        const colors = await extractColors(file, options);
+        
+        // Generate palette
+        const palette = generatePaletteCanvas(colors, 400, 80);
+        paletteCanvas.width = palette.width;
+        paletteCanvas.height = palette.height;
+        paletteCanvas.getContext('2d').drawImage(palette, 0, 0);
+        
+        // Render color cards
+        colorsGrid.innerHTML = colors.map(color => `
+          <div class="color-card">
+            <div class="color-swatch" style="background: ${color.hex}" data-hex="${color.hex}"></div>
+            <div class="color-info">
+              <div class="color-hex">${color.hex}</div>
+              <div class="color-percent">${color.percentage}%</div>
+            </div>
+          </div>
+        `).join('');
+        
+        // Copy on click
+        colorsGrid.querySelectorAll('.color-swatch').forEach(swatch => {
+          swatch.addEventListener('click', () => {
+            navigator.clipboard.writeText(swatch.dataset.hex);
+            showToast('Copied ' + swatch.dataset.hex);
+          });
+        });
+        
+        loading.style.display = 'none';
+        resultContent.style.display = 'block';
+      } catch (err) {
+        console.error(err);
+        loading.innerHTML = `<p style="color: #f66">Error: ${err.message}</p>`;
+      }
+    }
+    
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 2000);
+    }
+  </script>
+</body>
+</html>

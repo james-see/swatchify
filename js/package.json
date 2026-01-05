@@ -1,0 +1,46 @@
+{
+  "name": "swatchify",
+  "version": "0.1.0",
+  "description": "Extract dominant colors from images using k-means clustering - browser-only, no dependencies",
+  "type": "module",
+  "main": "./dist/swatchify.cjs",
+  "module": "./dist/swatchify.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/swatchify.js",
+      "require": "./dist/swatchify.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite example",
+    "build": "vite build && tsc --emitDeclarationOnly",
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "color",
+    "palette",
+    "extract",
+    "dominant",
+    "kmeans",
+    "image",
+    "swatch",
+    "browser"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/james-see/swatchify"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vite-plugin-dts": "^4.4.0"
+  }
+}
