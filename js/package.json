@@ -1,5 +1,5 @@
 {
-  "name": "swatchify",
+  "name": "swatchme",
   "version": "0.1.0",
   "description": "Extract dominant colors from images using k-means clustering - browser-only, no dependencies",
   "type": "module",

@@ -1,17 +1,17 @@
-# swatchify
+# swatchme
 
 Extract dominant colors from images using k-means clustering — browser-only, zero dependencies.
 
 ## Install
 
 ```bash
-npm install swatchify
+npm install swatchme
 ```
 
 ## Usage
 
 ```ts
-import { extractColors, generatePaletteCanvas } from 'swatchify';
+import { extractColors, generatePaletteCanvas } from 'swatchme';
 
 // From file input
 const file = document.querySelector('input[type="file"]').files[0];
@@ -77,7 +77,7 @@ img.src = dataUrl;
 Get black or white text color for optimal contrast on a background.
 
 ```ts
-import { getContrastColor } from 'swatchify';
+import { getContrastColor } from 'swatchme';
 
 const textColor = getContrastColor({ r: 74, g: 144, b: 217 });
 // '#FFFFFF'
