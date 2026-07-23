@@ -243,3 +243,41 @@ err := swatchify.GeneratePalette(colors []Color, outputPath string, opts *Palett
 ## License
 
 MIT
+
+## Goose / MCP Extension
+
+swatchify ships as an MCP server, so AI agents like [goose](https://goose-docs.ai/) can extract dominant colors from images as tools.
+
+### Build the MCP server
+
+```bash
+go install github.com/james-see/swatchify/cmd/mcp@latest
+```
+
+The binary is installed as `mcp` in your `$(go env GOPATH)/bin/`. Rename it to `swatchify-mcp`:
+
+```bash
+mv $(go env GOPATH)/bin/mcp $(go env GOPATH)/bin/swatchify-mcp
+```
+
+### Add to goose
+
+Add this to `~/.config/goose/config.yaml`:
+
+```yaml
+extensions:
+  swatchify:
+    name: Swatchify
+    cmd: swatchify-mcp
+    args: []
+    enabled: true
+    type: stdio
+    timeout: 60
+```
+
+### Available tools
+
+| Tool | Description |
+|------|-------------|
+| `extract_colors` | Extract dominant colors from an image (hex, percentage, RGB) |
+| `generate_palette` | Generate a color palette PNG from an image |
